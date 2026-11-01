@@ -5,6 +5,7 @@ import { Cli, z } from "incur";
 import { parse as parseYaml } from "yaml";
 import { expect, it } from "vitest";
 
+import { parseCliOutputArguments } from "../../../src/cliOutput.js";
 import {
   createCliResultOutput,
   streamCliCommandResults,
@@ -21,7 +22,10 @@ const runCli = async (arguments_: readonly string[]) => {
       callback();
     },
   });
-  const output = createCliResultOutput(arguments_, destination);
+  const output = createCliResultOutput(
+    parseCliOutputArguments(arguments_),
+    destination,
+  );
   if (output === undefined) throw new Error("Missing CLI result output owner");
   const cli = Cli.create("filtered-failure-test", { sync: false });
   cli.command("trace-application-feature", {
@@ -50,15 +54,21 @@ const runCli = async (arguments_: readonly string[]) => {
 };
 
 const expectMissingInputFailureText = (text: string, path: string): void => {
+  const normalizedText = text.replace(/\s+/g, " ");
   for (const value of [
     "invalid_request",
     "invalid_input",
-    "Correct the listed arguments and retry.",
+    "Read the declared input schema or CLI usage",
+    "trace-application-feature",
+    "tools/list",
+    "Correct the listed fields, then retry.",
+    "Do not repeat the unchanged call.",
+    "inspect_input_contract",
     path,
     "read-failed",
     "ENOENT",
   ])
-    expect(text).toContain(value);
+    expect(normalizedText).toContain(value);
 };
 
 it.each(["json", "toon", "yaml", "md"] as const)(
@@ -81,13 +91,22 @@ it.each(["json", "toon", "yaml", "md"] as const)(
         expect(result.output.failed).toBe(false);
         expect(result.fallback).toBe("");
         expect(result.output.handled).toBe(true);
-        if (format === "json") {
-          expect(JSON.parse(result.text)).toMatchObject({
+        expectMissingInputFailureText(result.text, missingPath);
+        if (format === "json" || format === "yaml") {
+          const document =
+            format === "json"
+              ? JSON.parse(result.text)
+              : parseYaml(result.text);
+          expect(document).toMatchObject({
             code: "invalid_request",
             category: "invalid_input",
-            retryable: true,
+            retryable: false,
             remediation: {
-              action: "Correct the listed arguments and retry.",
+              action: expect.stringContaining("tools/list"),
+            },
+            recovery: {
+              kind: "inspect_input_contract",
+              operation: "trace-application-feature",
             },
             details: {
               input_path: missingPath,
@@ -99,7 +118,7 @@ it.each(["json", "toon", "yaml", "md"] as const)(
               ],
             },
           });
-        } else expectMissingInputFailureText(result.text, missingPath);
+        }
       } finally {
         process.exitCode = previousExitCode;
       }
@@ -126,7 +145,14 @@ it.each(["json", "toon", "yaml", "md"] as const)(
           error: {
             code: "invalid_request",
             category: "invalid_input",
-            retryable: true,
+            retryable: false,
+            remediation: {
+              action: expect.stringContaining("tools/list"),
+            },
+            recovery: {
+              kind: "inspect_input_contract",
+              operation: "trace-application-feature",
+            },
             details: {
               input_path: missingPath,
               input_reason: "read-failed",
@@ -156,7 +182,10 @@ it("keeps successful scalar filtering available", async () => {
     },
   });
   const argv = ["open-control", "--json", "--filter-output", "open"];
-  const output = createCliResultOutput(argv, destination);
+  const output = createCliResultOutput(
+    parseCliOutputArguments(argv),
+    destination,
+  );
   if (output === undefined) throw new Error("Missing CLI result output owner");
   const cli = Cli.create("filtered-failure-test", { sync: false });
   cli.command("open-control", { run: () => ({ open: false }) });

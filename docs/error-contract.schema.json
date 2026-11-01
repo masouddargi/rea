@@ -28,6 +28,42 @@
           "required": ["action"],
           "additionalProperties": false
         },
+        "recovery": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_input_contract" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_timeout_state" },
+                "operation": { "type": "string", "minLength": 1 },
+                "timeout_ms": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["kind", "operation", "timeout_ms"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "retry_cleanup" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            }
+          ]
+        },
         "details": {
           "type": "object",
           "propertyNames": { "type": "string" },
@@ -63,6 +99,42 @@
           "properties": { "action": { "type": "string", "minLength": 1 } },
           "required": ["action"],
           "additionalProperties": false
+        },
+        "recovery": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_input_contract" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_timeout_state" },
+                "operation": { "type": "string", "minLength": 1 },
+                "timeout_ms": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["kind", "operation", "timeout_ms"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "retry_cleanup" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            }
+          ]
         },
         "details": {
           "type": "object",
@@ -100,6 +172,42 @@
           "required": ["action"],
           "additionalProperties": false
         },
+        "recovery": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_input_contract" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_timeout_state" },
+                "operation": { "type": "string", "minLength": 1 },
+                "timeout_ms": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["kind", "operation", "timeout_ms"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "retry_cleanup" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            }
+          ]
+        },
         "details": {
           "type": "object",
           "propertyNames": { "type": "string" },
@@ -135,6 +243,42 @@
           "properties": { "action": { "type": "string", "minLength": 1 } },
           "required": ["action"],
           "additionalProperties": false
+        },
+        "recovery": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_input_contract" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_timeout_state" },
+                "operation": { "type": "string", "minLength": 1 },
+                "timeout_ms": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["kind", "operation", "timeout_ms"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "retry_cleanup" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            }
+          ]
         },
         "details": {
           "type": "object",
@@ -172,6 +316,42 @@
           "required": ["action"],
           "additionalProperties": false
         },
+        "recovery": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_input_contract" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_timeout_state" },
+                "operation": { "type": "string", "minLength": 1 },
+                "timeout_ms": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["kind", "operation", "timeout_ms"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "retry_cleanup" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            }
+          ]
+        },
         "details": {
           "type": "object",
           "propertyNames": { "type": "string" },
@@ -207,6 +387,42 @@
           "properties": { "action": { "type": "string", "minLength": 1 } },
           "required": ["action"],
           "additionalProperties": false
+        },
+        "recovery": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_input_contract" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_timeout_state" },
+                "operation": { "type": "string", "minLength": 1 },
+                "timeout_ms": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["kind", "operation", "timeout_ms"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "retry_cleanup" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            }
+          ]
         },
         "details": {
           "type": "object",
@@ -244,6 +460,42 @@
           "required": ["action"],
           "additionalProperties": false
         },
+        "recovery": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_input_contract" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_timeout_state" },
+                "operation": { "type": "string", "minLength": 1 },
+                "timeout_ms": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["kind", "operation", "timeout_ms"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "retry_cleanup" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            }
+          ]
+        },
         "details": {
           "type": "object",
           "propertyNames": { "type": "string" },
@@ -279,6 +531,42 @@
           "properties": { "action": { "type": "string", "minLength": 1 } },
           "required": ["action"],
           "additionalProperties": false
+        },
+        "recovery": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_input_contract" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_timeout_state" },
+                "operation": { "type": "string", "minLength": 1 },
+                "timeout_ms": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["kind", "operation", "timeout_ms"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "retry_cleanup" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            }
+          ]
         },
         "details": {
           "type": "object",
@@ -316,6 +604,42 @@
           "required": ["action"],
           "additionalProperties": false
         },
+        "recovery": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_input_contract" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_timeout_state" },
+                "operation": { "type": "string", "minLength": 1 },
+                "timeout_ms": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["kind", "operation", "timeout_ms"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "retry_cleanup" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            }
+          ]
+        },
         "details": {
           "type": "object",
           "propertyNames": { "type": "string" },
@@ -351,6 +675,42 @@
           "properties": { "action": { "type": "string", "minLength": 1 } },
           "required": ["action"],
           "additionalProperties": false
+        },
+        "recovery": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_input_contract" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_timeout_state" },
+                "operation": { "type": "string", "minLength": 1 },
+                "timeout_ms": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["kind", "operation", "timeout_ms"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "retry_cleanup" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            }
+          ]
         },
         "details": {
           "type": "object",
@@ -388,18 +748,50 @@
           "required": ["action"],
           "additionalProperties": false
         },
+        "recovery": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_input_contract" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_timeout_state" },
+                "operation": { "type": "string", "minLength": 1 },
+                "timeout_ms": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["kind", "operation", "timeout_ms"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "retry_cleanup" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            }
+          ]
+        },
         "details": {
           "anyOf": [
             {
               "type": "object",
               "properties": {
                 "logical_path": { "type": "string" },
-                "declared_sha256": {
-                  "anyOf": [{ "type": "string" }, { "type": "null" }]
-                },
-                "calculated_sha256": {
-                  "anyOf": [{ "type": "string" }, { "type": "null" }]
-                },
+                "declared_sha256": { "type": ["string", "null"] },
+                "calculated_sha256": { "type": ["string", "null"] },
                 "unpacked": { "type": "boolean" }
               },
               "required": [
@@ -408,7 +800,7 @@
                 "calculated_sha256",
                 "unpacked"
               ],
-              "additionalProperties": false
+              "additionalProperties": {}
             },
             {
               "type": "object",
@@ -434,7 +826,33 @@
                 "calculated_md5",
                 "unpacked"
               ],
-              "additionalProperties": false
+              "additionalProperties": {}
+            },
+            {
+              "type": "object",
+              "properties": {
+                "logical_path": { "type": "string" },
+                "algorithm": { "type": "string", "const": "dfu-crc32" },
+                "declared_crc32": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{8}$"
+                },
+                "calculated_crc32": {
+                  "anyOf": [
+                    { "type": "string", "pattern": "^[a-f0-9]{8}$" },
+                    { "type": "null" }
+                  ]
+                },
+                "unpacked": { "type": "boolean" }
+              },
+              "required": [
+                "logical_path",
+                "algorithm",
+                "declared_crc32",
+                "calculated_crc32",
+                "unpacked"
+              ],
+              "additionalProperties": {}
             }
           ]
         }
@@ -476,6 +894,42 @@
           "required": ["action"],
           "additionalProperties": false
         },
+        "recovery": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_input_contract" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_timeout_state" },
+                "operation": { "type": "string", "minLength": 1 },
+                "timeout_ms": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["kind", "operation", "timeout_ms"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "retry_cleanup" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            }
+          ]
+        },
         "details": {
           "type": "object",
           "propertyNames": { "type": "string" },
@@ -511,6 +965,42 @@
           "properties": { "action": { "type": "string", "minLength": 1 } },
           "required": ["action"],
           "additionalProperties": false
+        },
+        "recovery": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_input_contract" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_timeout_state" },
+                "operation": { "type": "string", "minLength": 1 },
+                "timeout_ms": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["kind", "operation", "timeout_ms"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "retry_cleanup" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            }
+          ]
         },
         "details": {
           "type": "object",
@@ -548,6 +1038,42 @@
           "required": ["action"],
           "additionalProperties": false
         },
+        "recovery": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_input_contract" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_timeout_state" },
+                "operation": { "type": "string", "minLength": 1 },
+                "timeout_ms": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["kind", "operation", "timeout_ms"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "retry_cleanup" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            }
+          ]
+        },
         "details": {
           "type": "object",
           "propertyNames": { "type": "string" },
@@ -583,6 +1109,42 @@
           "properties": { "action": { "type": "string", "minLength": 1 } },
           "required": ["action"],
           "additionalProperties": false
+        },
+        "recovery": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_input_contract" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_timeout_state" },
+                "operation": { "type": "string", "minLength": 1 },
+                "timeout_ms": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["kind", "operation", "timeout_ms"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "retry_cleanup" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            }
+          ]
         },
         "details": {
           "type": "object",
@@ -620,6 +1182,42 @@
           "required": ["action"],
           "additionalProperties": false
         },
+        "recovery": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_input_contract" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_timeout_state" },
+                "operation": { "type": "string", "minLength": 1 },
+                "timeout_ms": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["kind", "operation", "timeout_ms"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "retry_cleanup" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            }
+          ]
+        },
         "details": {
           "type": "object",
           "propertyNames": { "type": "string" },
@@ -655,6 +1253,42 @@
           "properties": { "action": { "type": "string", "minLength": 1 } },
           "required": ["action"],
           "additionalProperties": false
+        },
+        "recovery": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_input_contract" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_timeout_state" },
+                "operation": { "type": "string", "minLength": 1 },
+                "timeout_ms": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["kind", "operation", "timeout_ms"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "retry_cleanup" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            }
+          ]
         },
         "details": {
           "type": "object",
@@ -692,6 +1326,42 @@
           "required": ["action"],
           "additionalProperties": false
         },
+        "recovery": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_input_contract" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_timeout_state" },
+                "operation": { "type": "string", "minLength": 1 },
+                "timeout_ms": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["kind", "operation", "timeout_ms"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "retry_cleanup" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            }
+          ]
+        },
         "details": {
           "type": "object",
           "propertyNames": { "type": "string" },
@@ -728,6 +1398,42 @@
           "required": ["action"],
           "additionalProperties": false
         },
+        "recovery": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_input_contract" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_timeout_state" },
+                "operation": { "type": "string", "minLength": 1 },
+                "timeout_ms": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["kind", "operation", "timeout_ms"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "retry_cleanup" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            }
+          ]
+        },
         "details": {
           "type": "object",
           "propertyNames": { "type": "string" },
@@ -763,6 +1469,42 @@
           "properties": { "action": { "type": "string", "minLength": 1 } },
           "required": ["action"],
           "additionalProperties": false
+        },
+        "recovery": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_input_contract" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "inspect_timeout_state" },
+                "operation": { "type": "string", "minLength": 1 },
+                "timeout_ms": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["kind", "operation", "timeout_ms"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "type": "string", "const": "retry_cleanup" },
+                "operation": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "operation"],
+              "additionalProperties": false
+            }
+          ]
         },
         "details": {
           "type": "object",
