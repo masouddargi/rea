@@ -12,7 +12,7 @@ import {
   type BinaryTarget,
 } from "../domain/binaryTargetTypes.js";
 import { err, ok } from "../domain/result.js";
-import { AnalysisCancelledError } from "../domain/analysisErrorCore.js";
+import { cancelledBy } from "../domain/analysisErrorCore.js";
 import { projectAnalysisError } from "../domain/analysisErrorProjection.js";
 import type {
   AnalysisClient,
@@ -257,7 +257,7 @@ export class IdaProvider implements AnalysisProviderCandidate {
           code: "open_options_invalid",
           reason: unusable,
           remediation:
-            "Set workspaceRoot to an existing directory REA can create entries in, or omit it to use the system temporary directory; see docs/ida-provider.md.",
+            "Set workspaceRoot to an existing directory REA can create entries in, or omit it to use the system temporary directory; see docs/providers/ida-provider.md.",
           diagnostics: {
             ...registrationDiagnostics,
             mode: "headless",
@@ -368,11 +368,7 @@ export class IdaProvider implements AnalysisProviderCandidate {
     options?: AnalysisProfileResolutionOptions,
   ) {
     if (options?.signal?.aborted === true)
-      return err(
-        new AnalysisCancelledError("ida:profile", {
-          cause: options.signal.reason,
-        }),
-      );
+      return err(cancelledBy("ida:profile", options.signal));
     const config = await this.#configuration(options);
     if (!config.ok) return config;
     const profile = createAnalysisProfile(IDA_PROVIDER_IDENTITY, {
@@ -460,6 +456,6 @@ export class IdaProvider implements AnalysisProviderCandidate {
 const readIdaConfigurationNotConfigured = () =>
   err(
     idaConfigurationError(
-      "Set REA_IDA_MCP_CONFIG to an upstream IDA MCP JSON registration; see docs/ida-provider.md.",
+      "Set REA_IDA_MCP_CONFIG to an upstream IDA MCP JSON registration; see docs/providers/ida-provider.md.",
     ),
   );

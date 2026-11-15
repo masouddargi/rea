@@ -62,15 +62,16 @@ export const isImmutableEvidenceBundle = (
   typeof input === "object" && input !== null && immutableBundles.has(input);
 
 /** Caller input has valid shape but is not in authenticated canonical form. */
-export class NonCanonicalEvidenceBundleError extends TypeError {
-  constructor() {
-    super("Evidence bundle manifests are not canonical");
+class NonCanonicalEvidenceBundleError extends TypeError {
+  /** The top-level sections whose content differs from canonical form. */
+  constructor(readonly sections: readonly string[]) {
+    super(`Evidence bundle sections are not canonical: ${sections.join(", ")}`);
     this.name = "NonCanonicalEvidenceBundleError";
   }
 }
 
 /** Caller input lists the same Evidence record more than once. */
-export class DuplicateEvidenceRecordError extends TypeError {
+class DuplicateEvidenceRecordError extends TypeError {
   constructor() {
     super("Evidence bundle contains duplicate record IDs");
     this.name = "DuplicateEvidenceRecordError";
@@ -157,7 +158,7 @@ export const createEvidenceBundle = (
   };
 };
 
-/** Retain target records and eligible complete unknown histories with their mutation evidence. */
+/** Retain target records, their linked sources, and eligible complete unknown histories. */
 export const evidenceBundleForTarget = (
   bundle: EvidenceBundle,
   sha256: string,
@@ -218,17 +219,37 @@ export const evidenceBundleForTarget = (
   const mutationIds = new Set(
     unknowns.flatMap(({ mutation_evidence_ids: ids }) => ids),
   );
+  const selectedIds = new Set(
+    bundle.records
+      .filter(
+        (record) =>
+          record.subject?.digest.sha256 === sha256 ||
+          mutationIds.has(record.evidence_id),
+      )
+      .map((record) => record.evidence_id),
+  );
+  // Source Evidence may have no subject or describe a different artifact.
+  // Follow only explicit links from selected records, retaining missing links
+  // as missing rather than inventing or importing unrelated observations.
+  const pendingEvidence = [...selectedIds];
+  for (let index = 0; index < pendingEvidence.length; index += 1) {
+    const record = recordsById.get(pendingEvidence[index] ?? "");
+    for (const id of record?.evidence_links ?? []) {
+      if (!selectedIds.has(id) && recordsById.has(id)) {
+        selectedIds.add(id);
+        pendingEvidence.push(id);
+      }
+    }
+  }
   return createEvidenceBundle(
-    bundle.records.filter(
-      (record) =>
-        record.subject?.digest.sha256 === sha256 ||
-        mutationIds.has(record.evidence_id),
-    ),
+    bundle.records.filter((record) => selectedIds.has(record.evidence_id)),
     unknowns,
   );
 };
 
-const referencedEvidenceIds = (unknown: ResidualUnknown): readonly string[] => [
+export const referencedEvidenceIds = (
+  unknown: ResidualUnknown,
+): readonly string[] => [
   ...unknown.supporting_evidence_ids,
   ...unknown.contradicting_evidence_ids,
   ...unknown.mutation_evidence_ids,
@@ -382,7 +403,13 @@ const authenticateBundle = (
     parsed.unknowns,
   );
   if (!equalJsonText(parsed, canonical))
-    throw new NonCanonicalEvidenceBundleError();
+    // Name only the sections that differ, so an unchanged section is not
+    // blamed for another section's ordering or content.
+    throw new NonCanonicalEvidenceBundleError(
+      (Object.keys(canonical) as (keyof EvidenceBundle)[]).filter(
+        (section) => !equalJsonText(parsed[section], canonical[section]),
+      ),
+    );
   if (seal) {
     freezeJsonSnapshot(canonical);
     immutableBundles.set(canonical, canonical);
@@ -430,13 +457,7 @@ const validateUnknownGraph = (
     unknownById.set(id, head);
   }
   for (const unknown of unknowns) {
-    const referencedEvidence = [
-      ...unknown.supporting_evidence_ids,
-      ...unknown.contradicting_evidence_ids,
-      ...unknown.mutation_evidence_ids,
-      ...(unknown.resolution?.evidence_ids ?? []),
-    ];
-    for (const evidenceId of referencedEvidence)
+    for (const evidenceId of referencedEvidenceIds(unknown))
       if (!evidenceById.has(evidenceId))
         throw new InvalidResidualUnknownGraphError({
           kind: "missing_evidence",

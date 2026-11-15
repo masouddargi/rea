@@ -1,6 +1,6 @@
 import { JEB_PROVIDER_IDENTITY } from "./JebProviderIdentity.js";
 import {
-  JebMcpAcquisitionCleanupFailure,
+  JebMcpCleanupFailure,
   JebMcpPhysicalFailure,
 } from "./JebMcpConnectionOwner.js";
 import { createAnalysisExecutionEvidence } from "../domain/analysisObservation.js";
@@ -24,6 +24,7 @@ import {
   AnalysisCapabilityUnavailableError,
   AnalysisProtocolError,
   AnalysisTimeoutError,
+  cancelledBy,
 } from "../domain/analysisErrorCore.js";
 import { AnalysisError } from "../domain/analysisErrorBase.js";
 import { ProviderAdapterError } from "../domain/providerAdapterError.js";
@@ -160,6 +161,8 @@ export class JebProvider implements JebAnalysisPort {
     | Pick<z.infer<typeof clientInformation>, "version" | "gui_client">
     | undefined;
 
+  #informationGeneration: number | undefined;
+
   #identity(version: string | null | undefined): ProviderIdentity {
     return {
       ...JEB_PROVIDER_IDENTITY,
@@ -214,6 +217,8 @@ export class JebProvider implements JebAnalysisPort {
     } catch (cause) {
       if (signal?.aborted === true) throw cause;
       if (cause instanceof AnalysisError) {
+        if (cause.cleanupIncomplete)
+          throw this.#providerFailure("inspect_jeb_client", cause);
         // The failure's owner, such as the discovery deadline, also owns the repair.
         const projected = projectAnalysisError(cause);
         return {
@@ -247,8 +252,7 @@ export class JebProvider implements JebAnalysisPort {
   ): Promise<Result<AnalysisExecution, AnalysisError>> {
     if (options?.signal?.aborted === true)
       return err(
-        new AnalysisCancelledError(request.operation, {
-          cause: options.signal.reason,
+        cancelledBy(request.operation, options.signal, {
           diagnostics: { endpoint: this.#selectedEndpoint },
         }),
       );
@@ -265,8 +269,7 @@ export class JebProvider implements JebAnalysisPort {
     signal: AbortSignal | undefined,
   ): Promise<Result<AnalysisExecution, AnalysisError>> {
     const cancelled = (operation: JebOperation) => {
-      if (signal?.aborted === true)
-        throw new AnalysisCancelledError(operation, { cause: signal.reason });
+      if (signal?.aborted === true) throw cancelledBy(operation, signal);
     };
     switch (request.operation) {
       case "inspect_jeb_client": {
@@ -298,8 +301,10 @@ export class JebProvider implements JebAnalysisPort {
     readonly gui_client: boolean | null;
   }> {
     const information =
-      this.#clientInformation ??
-      (await this.#refreshClientInformation(operation, signal)).information;
+      this.#informationGeneration === this.#connection.sessionGeneration &&
+      this.#clientInformation !== undefined
+        ? this.#clientInformation
+        : (await this.#refreshClientInformation(operation, signal)).information;
     return {
       name: "jeb",
       version: information.version ?? null,
@@ -348,8 +353,7 @@ export class JebProvider implements JebAnalysisPort {
     operation: JebOperation,
     signal: AbortSignal | undefined,
   ) {
-    if (signal?.aborted === true)
-      throw new AnalysisCancelledError(operation, { cause: signal.reason });
+    if (signal?.aborted === true) throw cancelledBy(operation, signal);
     const payload = await this.#connection.call(
       "get_client_information",
       {},
@@ -366,6 +370,7 @@ export class JebProvider implements JebAnalysisPort {
       version: information.version,
       gui_client: information.gui_client,
     };
+    this.#informationGeneration = this.#connection.sessionGeneration;
     return { information, payload };
   }
 
@@ -535,7 +540,7 @@ export class JebProvider implements JebAnalysisPort {
   }
 
   #providerFailure(operation: JebOperation, cause: unknown): AnalysisError {
-    if (cause instanceof JebMcpAcquisitionCleanupFailure)
+    if (cause instanceof JebMcpCleanupFailure)
       return analysisErrorWithCleanupFailure(
         this.#providerFailure(operation, cause.primaryFailure),
         cause.cleanupFailure,
@@ -548,7 +553,6 @@ export class JebProvider implements JebAnalysisPort {
       cause instanceof AnalysisTimeoutError
     ) {
       const options = {
-        cause: cause.cause,
         diagnostics: {
           ...cause.diagnostics,
           endpoint: this.#selectedEndpoint,
@@ -561,14 +565,16 @@ export class JebProvider implements JebAnalysisPort {
         cause instanceof AnalysisTimeoutError
           ? new AnalysisTimeoutError(operation, cause.timeoutMs, {
               ...options,
+              cause: cause.cause,
               ...(cause.userMessage === undefined
                 ? {}
                 : { userMessage: cause.userMessage }),
               ...(cause.remediationAction === undefined
                 ? {}
                 : { remediationAction: cause.remediationAction }),
+              ...(cause.limit === undefined ? {} : { limit: cause.limit }),
             })
-          : new AnalysisCancelledError(operation, options);
+          : cancelledBy(operation, cause, options);
       return failure
         .bindCleanupDependencies([cause])
         .bindCleanupResourceOwner(cause);

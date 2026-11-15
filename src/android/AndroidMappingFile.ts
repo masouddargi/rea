@@ -4,6 +4,7 @@ import {
   bindArtifactFileCleanup,
 } from "../artifacts/ArtifactFileOperation.js";
 import { ArtifactReaderFailure } from "../artifacts/ArtifactReader.js";
+import { stableArtifactInputRecovery } from "../artifacts/StableArtifactFailure.js";
 import type { ArtifactResourceScope } from "../artifacts/ArtifactResourceScope.js";
 import { readStableArtifact } from "../artifacts/readStableArtifact.js";
 import {
@@ -16,10 +17,11 @@ import { analysisErrorWithCleanupFailure } from "../domain/analysisErrorCleanup.
 import {
   AnalysisAccessDeniedError,
   AnalysisArtifactChangedError,
-  AnalysisCancelledError,
   AnalysisInputError,
   AnalysisResourceConstraintError,
   AnalysisTimeoutError,
+  cancelledBy,
+  carriedReason,
 } from "../domain/analysisErrorCore.js";
 import { ProviderAdapterError } from "../domain/providerAdapterError.js";
 import { ProviderCleanupError } from "../domain/providerCleanupError.js";
@@ -50,7 +52,7 @@ const mappingInterruption = (
         cause,
         ...jadxOperationTimeoutGuidance(read.deadline.timeoutMs),
       })
-    : new AnalysisCancelledError(read.operation, { cause });
+    : cancelledBy(read.operation, carriedReason(cause));
 
 const invalidMapping = (
   read: MappingRead,
@@ -99,6 +101,7 @@ const readFailurePrimary = (
   if (owned?.reason === "path")
     return invalidMapping(read, "invalid_value", owned.message, {
       cause: owned,
+      ...stableArtifactInputRecovery(owned),
     });
   if (primary instanceof Error && "code" in primary) {
     if (primary.code === "EACCES" || primary.code === "EPERM")

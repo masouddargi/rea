@@ -4,7 +4,11 @@ import { jsonRecordSchema } from "../domain/jsonRecord.js";
 import { AnalysisCleanupLease } from "../artifacts/AnalysisCleanupLease.js";
 import type { RetainedResourceScope } from "../application/AnalysisProvider.js";
 import { ConfigurationError } from "../domain/configurationErrors.js";
-import { AnalysisCancelledError } from "../domain/analysisErrorCore.js";
+import {
+  AnalysisCancelledError,
+  cancelledBy,
+  carriedReason,
+} from "../domain/analysisErrorCore.js";
 import type { AnalysisInputIssue } from "../domain/analysisErrorCore.js";
 import { projectInputIssues } from "../domain/inputIssueProjection.js";
 import { err, ok, type Result } from "../domain/result.js";
@@ -25,6 +29,14 @@ export const DEFAULT_IDA_REQUEST_TIMEOUT_MS = 300_000;
 const MIN_IDA_REQUEST_TIMEOUT_MS = 1;
 /** Node timer ceiling. Larger registration values would be clamped instead of honored. */
 export const MAX_IDA_REQUEST_TIMEOUT_MS = 2_147_483_647;
+/** Loopback names plus the Docker and Podman gateway names for the container's host. */
+const LOCAL_IDA_HTTP_HOSTS: ReadonlySet<string> = new Set([
+  "localhost",
+  "127.0.0.1",
+  "[::1]",
+  "host.docker.internal",
+  "host.containers.internal",
+]);
 
 const common = {
   sensitive: z
@@ -64,7 +76,7 @@ const registrationSchema = z
           const url = new URL(value);
           return (
             ["http:", "https:"].includes(url.protocol) &&
-            ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname) &&
+            LOCAL_IDA_HTTP_HOSTS.has(url.hostname) &&
             url.username === "" &&
             url.password === ""
           );
@@ -192,13 +204,13 @@ export const readIdaConfiguration = (
       if (constraints.length === 0)
         return err(
           idaConfigurationError(
-            "REA_IDA_MCP_CONFIG must contain an IDA MCP command/args or local url registration; see docs/ida-provider.md.",
+            "REA_IDA_MCP_CONFIG must contain an IDA MCP command/args or local url registration; see docs/providers/ida-provider.md.",
             parsed.error,
           ),
         );
       return err(
         new ConfigurationError(
-          `REA_IDA_MCP_CONFIG: ${constraints.join("; ")}. See docs/ida-provider.md.`,
+          `REA_IDA_MCP_CONFIG: ${constraints.join("; ")}. See docs/providers/ida-provider.md.`,
           {
             cause: parsed.error,
             settings: constraints.map((constraint) => ({
@@ -221,22 +233,26 @@ export const readIdaConfiguration = (
       const cancellation = regularFileCancellation(cause);
       if (cancellation !== undefined) {
         if (cause instanceof RegularFileCleanupFailure) {
-          const error = new AnalysisCancelledError("ida:registration", {
-            cause: cancellation.reason,
-            cleanup: {
-              reason:
-                cause.cleanupCause instanceof Error
-                  ? cause.cleanupCause.message
-                  : String(cause.cleanupCause),
-              resources: [path],
+          const error = cancelledBy(
+            "ida:registration",
+            carriedReason(cancellation.reason),
+            {
+              cleanup: {
+                reason:
+                  cause.cleanupCause instanceof Error
+                    ? cause.cleanupCause.message
+                    : String(cause.cleanupCause),
+                resources: [path],
+              },
             },
-          });
+          );
           closeLease?.bindCleanupError(error);
           throw error;
         }
-        throw new AnalysisCancelledError("ida:registration", {
-          cause: cancellation.reason,
-        });
+        throw cancelledBy(
+          "ida:registration",
+          carriedReason(cancellation.reason),
+        );
       }
       if (cause instanceof RegularFileCleanupFailure) {
         const primary =

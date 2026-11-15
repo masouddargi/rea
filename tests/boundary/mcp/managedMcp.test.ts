@@ -193,7 +193,7 @@ it("runs every managed static inspection independently of an active native targe
     },
   });
   await assertFieldMemberRefToken(client, fieldTokenPath);
-}, 30_000);
+});
 
 it("compares observed call-target names through the managed MCP contract", async () => {
   const directory = await createTestTempDirectory("rea-managed-call-target-");
@@ -308,7 +308,7 @@ it("opens a managed PE and executes the managed static provider through MCP", as
     rightPath,
     assertOutput,
   );
-}, 30_000);
+});
 
 const verifyManagedCatalogAndNativeWorkflow = async (
   client: Client,
@@ -344,6 +344,16 @@ const verifyManagedCatalogAndNativeWorkflow = async (
   await outputAssertion.assert("verify_managed_native_boundaries", verified);
   expect(verified).toMatchObject({
     evidence_id: expect.stringMatching(/^ev_[a-f0-9]{64}$/u),
+    operation: "verify_managed_native_boundaries",
+    provider: { id: "rea-dotnet-workflows" },
+    confidence: "inferred",
+    authority: "analyst-inference",
+    evidence_links: [
+      MANAGED_NATIVE_VERIFICATION_EXAMPLE.managed_boundaries.evidence_id,
+      ...MANAGED_NATIVE_VERIFICATION_EXAMPLE.native_observations.map(
+        ({ evidence_id }) => evidence_id,
+      ),
+    ],
     normalized_result: {
       summary: { verified: 1 },
       algorithm: { token_to_address_mapping: "not-inferred" },

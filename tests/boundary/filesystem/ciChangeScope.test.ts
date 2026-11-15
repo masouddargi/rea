@@ -106,7 +106,7 @@ async function classify(
 it.each([
   ["bridge/native/rea_lldb_tracer.py", "python"],
   ["bridge/pwndbg/test_core_context.py", "python"],
-  ["tests/support/analysis-efficiency/test_signal_oracle.py", "python"],
+  ["tests/support/analysis-efficiency/test_catalog_eval.py", "python"],
   ["scripts/run-python-tests.py", "python"],
   ["scripts/verify-browser-request.mjs", "browser"],
   ["scripts/lib/browser-request-e2e.mjs", "browser"],
@@ -196,6 +196,16 @@ it("keeps every translated README and authored guide on the documentation lane",
   expect(await classify(directory, base, head)).toMatchObject({
     code: false,
     package: false,
+    docs: true,
+  });
+});
+
+it("runs documentation verification when only its published-route verifier changes", async () => {
+  const { directory, base } = await fixture();
+  const head = await change(directory, [
+    "scripts/verify-documentation-routes.mjs",
+  ]);
+  expect(await classify(directory, base, head)).toMatchObject({
     docs: true,
   });
 });
@@ -331,8 +341,6 @@ it.each([
   "tests/boundary/providers/GdbSessionManagerCoverage.test.ts",
   "tests/boundary/providers/GdbCommandQueue.test.ts",
   "tests/boundary/providers/RizinDebugSessionCoverage.part3.test.ts",
-  "tests/boundary/providers/RizinCommandTimeout.test.ts",
-  "tests/boundary/providers/RizinTimeoutEvidence.test.ts",
   "tests/boundary/providers/GdbSessionReviewRegressions.test.ts",
   "tests/boundary/providers/gdbTestHelpers.ts",
   "tests/boundary/providers/RizinDebugSessionReviewRegressions.test.ts",
@@ -346,6 +354,7 @@ it.each([
   "tests/support/reverseEngineeringService.ts",
   "tests/support/ownedRizinCommandEvidenceTests.ts",
   "tests/support/reverseDebuggerMcpTestHelpers.ts",
+  "tests/boundary/cli/debuggerOneShotExit.test.ts",
   "tests/boundary/cli/gdbStartupCleanupCli.test.ts",
   "vitest.reverse-tools.config.ts",
   "vitest.reverse-tools-semantics.config.ts",
@@ -492,6 +501,7 @@ it("selects only a trusted successful ancestor from recent CI push runs", async 
 }) => {
   skip(process.platform === "win32", "the fake gh is a POSIX shell script");
   const { directory, base } = await fixture();
+  const foreignBase = await change(directory, ["README.md"]);
   const head = await change(directory, ["src/evm/client.ts"]);
   const bin = join(directory, "fake-bin");
   await mkdir(bin);
@@ -508,7 +518,7 @@ it("selects only a trusted successful ancestor from recent CI push runs", async 
           conclusion: "success",
           head_branch: "main",
           head_repository: { full_name: "untrusted/fork" },
-          head_sha: base,
+          head_sha: foreignBase,
         },
         {
           event: "push",
@@ -683,6 +693,8 @@ it.each([
     { code: true, runtime: false, browser: false, package: false },
   ],
   ["scripts/lib/release-proposal.mjs", { code: true, package: true }],
+  ["scripts/lib/release-proposal.d.mts", { code: true, package: true }],
+  ["scripts/lib/release-pull-request.mjs", { code: true, package: true }],
   ["patches/release-please+17.3.0.patch", { code: true, package: true }],
   [
     "tests/boundary/filesystem/releaseProposal.test.ts",
@@ -692,6 +704,10 @@ it.each([
   [
     "website/public/examples/notes-electron/preload.js",
     { code: true, website: true, package: false },
+  ],
+  [
+    "website/public/index.html",
+    { code: false, docs: true, website: true, package: false },
   ],
   [
     "website/locales/zh-CN/messages.po",
@@ -757,6 +773,18 @@ it.each([
     { code: true, ghidra_bridge: true, runtime: false, package: false },
   ],
   [
+    "scripts/verify-ghidra-loader-relocation.mjs",
+    { code: true, ghidra_bridge: true, runtime: false, package: false },
+  ],
+  [
+    "tests/conformance/ghidra/ReaLoaderRelocationProbe.java",
+    { code: true, ghidra_bridge: true, runtime: false, package: false },
+  ],
+  [
+    "tests/conformance/ghidra/loader-relocation-provider.c",
+    { code: true, ghidra_bridge: true, runtime: false, package: false },
+  ],
+  [
     "src/ghidra/GhidraBridgeSources.ts",
     { code: true, ghidra_bridge: true, runtime: true, package: true },
   ],
@@ -773,7 +801,11 @@ it.each([
     { code: false, ghidra_bridge: true, runtime: false, package: false },
   ],
   [
-    "tests/conformance/ghidra/ReaArmContextProbe.java",
+    "tests/conformance/ghidra/ReaInstructionContextProbe.java",
+    { ghidra_bridge: true, runtime: false, package: false },
+  ],
+  [
+    "tests/conformance/ghidra/ReaComputedCallCoverageProbe.java",
     { ghidra_bridge: true, runtime: false, package: false },
   ],
   [
@@ -823,6 +855,14 @@ it.each([
     { code: true, runtime: true, package: true },
   ],
   ["src/adb/AdbConfiguration.ts", { code: true, runtime: true, package: true }],
+  [
+    "src/application/binaryDiagnostics/ByteEntropyService.ts",
+    { code: true, runtime: true, package: true },
+  ],
+  [
+    "tests/acceptance/byteEntropyWindowsIdentity.test.ts",
+    { code: true, runtime: true, package: true },
+  ],
   [
     "src/apktool/ApktoolConfiguration.ts",
     { code: true, runtime: true, package: true },
@@ -878,7 +918,14 @@ it.each([
   ["install.sh", { code: true, runtime: true, package: true, evm: false }],
   [
     ".agents/skills/reverse-engineer-anything/SKILL.md",
-    { code: true, runtime: true, docs: true, package: false, evm: false },
+    {
+      code: true,
+      runtime: true,
+      docs: true,
+      website: true,
+      package: false,
+      evm: false,
+    },
   ],
   [
     "scripts/verify-real-ghidra.mjs",
@@ -894,6 +941,18 @@ it.each([
   ],
   [
     "tests/boundary/cli/nativePlistCli.test.ts",
+    { code: true, apple: true, package: false, runtime: false },
+  ],
+  [
+    "tests/boundary/process/nativeUiVerifierLane.test.ts",
+    { code: true, apple: true, package: false, runtime: false },
+  ],
+  [
+    "tests/boundary/providers/native/nativeUiOffscreenWindow.test.ts",
+    { code: true, apple: true, package: false, runtime: false },
+  ],
+  [
+    "tests/conformance/native/ui-offscreen.swift",
     { code: true, apple: true, package: false, runtime: false },
   ],
   [
@@ -1444,6 +1503,26 @@ it.each([
   ],
   [
     "scripts/lib/cli-process-environment.mjs",
+    {
+      code: true,
+      package: true,
+      runtime: true,
+      javascript_recovery: true,
+      readiness: false,
+    },
+  ],
+  [
+    "scripts/lib/runtime-admission.mjs",
+    {
+      code: true,
+      package: true,
+      runtime: true,
+      javascript_recovery: true,
+      readiness: false,
+    },
+  ],
+  [
+    "scripts/lib/runtime-admission.d.mts",
     {
       code: true,
       package: true,
